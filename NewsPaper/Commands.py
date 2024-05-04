@@ -36,6 +36,9 @@ com2.like()
 a1.update_rating()
 a2.update_rating()
 
+# Здесь я пробовал разные команды, но мне не нравился вывод,
+# С коментами так и оставил в виде QuerySet
+# Если нужен другой вид одной строкой через values, дайте пожалуйста знать, я поправлю
 
 ba = Author.objects.order_by('-rating').first()
 f"Username: {ba.user.username}, Рейтинг: {ba.rating}"
