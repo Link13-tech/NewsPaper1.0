@@ -1,5 +1,5 @@
 {% extends 'flatpages/default.html' %}
-
+{% load custom_filters %}
 
 {% block title %}
 News
@@ -7,6 +7,10 @@ News
 
 
 {% block content %}
-<h1>{{ post }}</h1>
-
+    <h1>{{ post.title|censor }}</h1>
+    <h3>{{ post.post_time|date:'d M Y' }}</h3>
+    <hr>
+    <div style="font-size: 19px; line-height: 1.8; color: #800080;">
+        {{ post.content|censor }}
+    </div>
 {% endblock content %}
