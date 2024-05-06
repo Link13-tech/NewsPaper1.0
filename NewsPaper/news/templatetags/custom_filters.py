@@ -9,7 +9,7 @@ def censor(text):
     if not isinstance(text, str):
         raise ValueError("Этот фильтр может быть применен только к тексту")
 
-    censored_words = ["ржавчина", "место", "гость", "котором", "дверь", "напротив"]
+    censored_words = ["ржавчина", "место", "гость", "котором", "дверь", "напротив", "витрины", "перчатки"]
 
     censored_text = []
     for word in text.split():

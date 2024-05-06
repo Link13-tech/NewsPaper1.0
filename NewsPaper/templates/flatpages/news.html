@@ -7,22 +7,23 @@ News
 
 
 {% block content %}
+<div class="container-fluid">
     <h1>Все новости</h1>
     <h3>{{ news|length }}</h3>
     <hr>
     {% if posts %}
-        <table>
+        <table class="table table-borderless">
             <tr>
                 <td style="text-center; font-weight: bold; font-size: 17px">Заголовок</td>
-                <td style="text-center; font-weight: bold; font-size: 17px; white-space: nowrap;">Дата публикации</td>
+                <td style="text-center; font-weight: bold; font-size: 17px; padding-right: 100px;">Дата публикации</td>
                 <td style="text-center; font-weight: bold; font-size: 17px">Превью</td>
             </tr>
 
             {% for post in posts %}
             <tr>
                 <td style="text-align: left">{{ post.title|censor}}</td>
-                <td>{{ post.post_time|date:'d M Y' }}</td>
-                <td style="text-align: left;">{{ post.content|truncatewords:20|censor }}</td>
+                <td style="padding-right: 100px;">{{ post.post_time|date:'d M Y' }}</td>
+                <td style="text-align: left;">{{ post.content|truncatechars:21|censor }}</td>
             </tr>
             {% endfor %}
 
