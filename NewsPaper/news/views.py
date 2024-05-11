@@ -111,4 +111,3 @@ class ArticleDelete(DeleteView):
         if self.get_object().post_type != 'AR':
             return HttpResponseForbidden()
         return super().dispatch(request, *args, **kwargs)
-
