@@ -10,8 +10,11 @@ News
 {% block content %}
 <div class="container-fluid">
     <h3>{% current_time %}</h3>
-    <h1>Все новости</h1>
-    <h3>{{ news|length }}</h3>
+    <h1>Поиск новостей</h1>
+    <form action="" method="get">
+        {{ filterset.form.as_p }}
+        <input type="submit" value="Найти" />
+    </form>
     <hr>
     {% if posts %}
         <table class="table table-borderless">
