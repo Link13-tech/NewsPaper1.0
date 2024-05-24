@@ -1,6 +1,7 @@
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.http import HttpResponseForbidden
 from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Post
 from .filters import NewsFilter
 from .forms import PostForm
@@ -47,7 +48,8 @@ class NewsSearch(ListView):
         return context
 
 
-class NewsCreate(CreateView):
+class NewsCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
+    permission_required = ('news.add_post',)
     form_class = PostForm
     model = Post
     template_name = 'flatpages/post_edit.html'
@@ -58,7 +60,8 @@ class NewsCreate(CreateView):
         return super().form_valid(form)
 
 
-class ArticleCreate(CreateView):
+class ArticleCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
+    permission_required = ('news.add_post',)
     form_class = PostForm
     model = Post
     template_name = 'flatpages/post_edit.html'
@@ -69,7 +72,8 @@ class ArticleCreate(CreateView):
         return super().form_valid(form)
 
 
-class NewsUpdate(UpdateView):
+class NewsUpdate(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
+    permission_required = ('news.change_post',)
     form_class = PostForm
     model = Post
     template_name = 'flatpages/post_edit.html'
@@ -91,7 +95,8 @@ class NewsDelete(DeleteView):
         return super().dispatch(request, *args, **kwargs)
 
 
-class ArticleUpdate(UpdateView):
+class ArticleUpdate(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
+    permission_required = ('news.change_post',)
     form_class = PostForm
     model = Post
     template_name = 'flatpages/post_edit.html'
