@@ -156,3 +156,5 @@ LOGOUT_REDIRECT_URL = '/'
 ACCOUNT_FORMS = {'signup': 'accounts.forms.CommonSignupForm'}
 
 SOCIALACCOUNT_FORMS = {'signup': 'accounts.forms.CommonSocSignupForm'}
+
+SOCIALACCOUNT_AUTO_SIGNUP = False
