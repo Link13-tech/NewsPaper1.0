@@ -4,9 +4,19 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
+from django.contrib.auth.models import User
+from django.views.generic.edit import CreateView
+from .models import BaseRegisterForm
 
 
-class IndexView(LoginRequiredMixin, TemplateView):
+class BaseRegisterView(CreateView):
+    model = User
+    form_class = BaseRegisterForm
+    template_name = 'accounts/signup.html'
+    success_url = '/'
+
+
+class ProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'accounts/profile.html'
 
     def get_context_data(self, **kwargs):
