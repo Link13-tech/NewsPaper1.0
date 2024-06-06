@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.flatpages',
     'django_filters',
+    'django_apscheduler',
     'news',
     'accounts',
     'allauth',
@@ -87,6 +89,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
@@ -130,7 +133,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'ru'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
@@ -160,3 +163,19 @@ ACCOUNT_FORMS = {'signup': 'accounts.forms.CommonSignupForm'}
 SOCIALACCOUNT_FORMS = {'signup': 'accounts.forms.CommonSocSignupForm'}
 
 SOCIALACCOUNT_AUTO_SIGNUP = False
+
+dotenv_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'my_inf.env')
+load_dotenv(dotenv_path)
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_USE_SSL = True
+
+DEFAULT_FROM_EMAIL = os.getenv('EMAIL_FROM')
+SITE_URL = 'http://127.0.0.1:8000/'
+
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
+APSCHEDULER_RUN_NOW_TIMEOUT = 25
