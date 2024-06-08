@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.models import User
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
@@ -10,9 +10,11 @@ from .filters import NewsFilter
 from .forms import PostForm
 from django.core.mail import send_mail
 from django.conf import settings
+from news.tasks import send_email_to_subscribers_task
 import logging
 
 logger = logging.getLogger(__name__)
+
 
 class NewsList(ListView):
     model = Post
@@ -94,27 +96,27 @@ class NewsCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
         post.post_type = 'NE'
         post.save()
         form.save_m2m()
-        self.send_email_to_subscribers(post)
+        send_email_to_subscribers_task.delay(post.pk)
         return super().form_valid(form)
 
-    @staticmethod
-    def send_email_to_subscribers(post):
-        categories = post.categories.all()
-        subscribers = User.objects.filter(subscribed_categories__in=categories).distinct()
-        for subscriber in subscribers:
-            subject = f'Новая новость в категории'
-            message = f'Новость: {post.title}\n\n{post.content[:30]}...\n\nПрочитать полностью: {settings.SITE_URL}{reverse("news_detail", args=[post.pk])}'
-            recipient_list = [subscriber.email]
-
-            logger.info(f'Sending email to {subscriber.email}')
-            logger.info(f'Subject: {subject}')
-            logger.info(f'Message: {message}')
-
-            try:
-                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list)
-                logger.info(f'Email sent to {subscriber.email}')
-            except Exception as e:
-                logger.error(f'Error sending email to {subscriber.email}: {e}')
+    # @staticmethod
+    # def send_email_to_subscribers(post):
+    #     categories = post.categories.all()
+    #     subscribers = User.objects.filter(subscribed_categories__in=categories).distinct()
+    #     for subscriber in subscribers:
+    #         subject = f'Новая новость в категории'
+    #         message = f'Новость: {post.title}\n\n{post.content[:30]}...\n\nПрочитать полностью: {settings.SITE_URL}{reverse("news_detail", args=[post.pk])}'
+    #         recipient_list = [subscriber.email]
+    #
+    #         logger.info(f'Sending email to {subscriber.email}')
+    #         logger.info(f'Subject: {subject}')
+    #         logger.info(f'Message: {message}')
+    #
+    #         try:
+    #             send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list)
+    #             logger.info(f'Email sent to {subscriber.email}')
+    #         except Exception as e:
+    #             logger.error(f'Error sending email to {subscriber.email}: {e}')
 
 
 class ArticleCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
@@ -128,27 +130,27 @@ class ArticleCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
         post.post_type = 'AR'
         post.save()
         form.save_m2m()
-        self.send_email_to_subscribers(post)
+        send_email_to_subscribers_task.delay(post.pk)
         return super().form_valid(form)
 
-    @staticmethod
-    def send_email_to_subscribers(post):
-        categories = post.categories.all()
-        subscribers = User.objects.filter(subscribed_categories__in=categories).distinct()
-        for subscriber in subscribers:
-            subject = f'Новая статья в категории'
-            message = f'Статья: {post.title}\n\n{post.content[:30]}...\n\nПрочитать полностью: {settings.SITE_URL}{reverse("news_detail", args=[post.pk])}'
-            recipient_list = [subscriber.email]
-
-            logger.info(f'Sending email to {subscriber.email}')
-            logger.info(f'Subject: {subject}')
-            logger.info(f'Message: {message}')
-
-            try:
-                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list)
-                logger.info(f'Email sent to {subscriber.email}')
-            except Exception as e:
-                logger.error(f'Error sending email to {subscriber.email}: {e}')
+    # @staticmethod
+    # def send_email_to_subscribers(post):
+    #     categories = post.categories.all()
+    #     subscribers = User.objects.filter(subscribed_categories__in=categories).distinct()
+    #     for subscriber in subscribers:
+    #         subject = f'Новая статья в категории'
+    #         message = f'Статья: {post.title}\n\n{post.content[:30]}...\n\nПрочитать полностью: {settings.SITE_URL}{reverse("news_detail", args=[post.pk])}'
+    #         recipient_list = [subscriber.email]
+    #
+    #         logger.info(f'Sending email to {subscriber.email}')
+    #         logger.info(f'Subject: {subject}')
+    #         logger.info(f'Message: {message}')
+    #
+    #         try:
+    #             send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list)
+    #             logger.info(f'Email sent to {subscriber.email}')
+    #         except Exception as e:
+    #             logger.error(f'Error sending email to {subscriber.email}: {e}')
 
 
 class NewsUpdate(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):
