@@ -1,15 +1,13 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.contrib.auth.models import User
-from django.http import HttpResponseForbidden, HttpResponse
+from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Post, Category
 from .filters import NewsFilter
 from .forms import PostForm
-from django.core.mail import send_mail
-from django.conf import settings
+from django.core.cache import cache
 from news.tasks import send_email_to_subscribers_task
 import logging
 
@@ -62,6 +60,15 @@ class NewsDetail(DetailView):
     template_name = 'flatpages/new.html'
     context_object_name = 'post'
 
+    def get_object(self, *args, **kwargs):
+        obj = cache.get(f'news-{self.kwargs["pk"]}', None)
+
+        if not obj:
+            obj = super().get_object(queryset=self.queryset)
+            cache.set(f'news-{self.kwargs["pk"]}', obj)
+
+        return obj
+
 
 class NewsSearch(ListView):
     model = Post
@@ -99,25 +106,6 @@ class NewsCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
         send_email_to_subscribers_task.delay(post.pk)
         return super().form_valid(form)
 
-    # @staticmethod
-    # def send_email_to_subscribers(post):
-    #     categories = post.categories.all()
-    #     subscribers = User.objects.filter(subscribed_categories__in=categories).distinct()
-    #     for subscriber in subscribers:
-    #         subject = f'Новая новость в категории'
-    #         message = f'Новость: {post.title}\n\n{post.content[:30]}...\n\nПрочитать полностью: {settings.SITE_URL}{reverse("news_detail", args=[post.pk])}'
-    #         recipient_list = [subscriber.email]
-    #
-    #         logger.info(f'Sending email to {subscriber.email}')
-    #         logger.info(f'Subject: {subject}')
-    #         logger.info(f'Message: {message}')
-    #
-    #         try:
-    #             send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list)
-    #             logger.info(f'Email sent to {subscriber.email}')
-    #         except Exception as e:
-    #             logger.error(f'Error sending email to {subscriber.email}: {e}')
-
 
 class ArticleCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
     permission_required = ('news.add_post',)
@@ -132,25 +120,6 @@ class ArticleCreate(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
         form.save_m2m()
         send_email_to_subscribers_task.delay(post.pk)
         return super().form_valid(form)
-
-    # @staticmethod
-    # def send_email_to_subscribers(post):
-    #     categories = post.categories.all()
-    #     subscribers = User.objects.filter(subscribed_categories__in=categories).distinct()
-    #     for subscriber in subscribers:
-    #         subject = f'Новая статья в категории'
-    #         message = f'Статья: {post.title}\n\n{post.content[:30]}...\n\nПрочитать полностью: {settings.SITE_URL}{reverse("news_detail", args=[post.pk])}'
-    #         recipient_list = [subscriber.email]
-    #
-    #         logger.info(f'Sending email to {subscriber.email}')
-    #         logger.info(f'Subject: {subject}')
-    #         logger.info(f'Message: {message}')
-    #
-    #         try:
-    #             send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list)
-    #             logger.info(f'Email sent to {subscriber.email}')
-    #         except Exception as e:
-    #             logger.error(f'Error sending email to {subscriber.email}: {e}')
 
 
 class NewsUpdate(PermissionRequiredMixin, LoginRequiredMixin, UpdateView):

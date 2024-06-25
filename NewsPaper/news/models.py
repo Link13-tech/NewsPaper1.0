@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
 from django.urls import reverse
+from django.core.cache import cache
 
 
 class Author(models.Model):
@@ -47,6 +48,13 @@ class Post(models.Model):
 
     def __str__(self):
         return f'{self.title.title()}: {self.content[:20]}'
+
+    def get_absolute_url(self):
+        return f'/news/{self.id}'
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        cache.delete(f'news-{self.pk}')
 
     def like(self):
         self.rating += 1
