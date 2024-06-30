@@ -13,4 +13,19 @@ News
     <div style="font-size: 19px; line-height: 1.8; color: #800080;">
         {{ post.content|censor }}
     </div>
+    <p>Рейтинг: {{ post.rating }}</p>
+
+    <form action="{% url 'like_post' post.id %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit">Like</button>
+    </form>
+
+    <form action="{% url 'dislike_post' post.id %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit">Dislike</button>
+    </form>
+
+    <div>
+        <a href="{% url 'news_list' %}">К списку новостей</a>
+    </div>
 {% endblock content %}

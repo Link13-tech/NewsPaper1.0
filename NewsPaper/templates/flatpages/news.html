@@ -8,6 +8,22 @@ News
 
 
 {% block content %}
+<style>
+    .news-title {
+        color: black;
+        text-decoration: none; /* Убирает подчеркивание */
+        font-weight: normal;
+        transition: background-color 0.3s, color 0.3s; /* Плавное изменение фона и цвета текста при наведении */
+        display: inline-block; /* Позволяет элементу занимать только столько места, сколько необходимо */
+        padding: 5px 10px; /* Отступы вокруг текста */
+        border-radius: 5px; /* Закругление углов */
+    }
+    .news-title:hover {
+        background-color: #cccccc; /* Серый фон при наведении */
+        color: black; /* Цвет текста при наведении */
+        cursor: pointer; /* Меняет курсор на указатель */
+    }
+</style>
 <div class="container-fluid">
     <h3>{% current_time %}</h3>
     <h1>Все новости</h1>
@@ -56,7 +72,9 @@ News
 
             {% for post in news %}
             <tr>
-                <td style="text-align: left">{{ post.title|censor}}</td>
+                <td style="text-align: left">
+                    <a href="{% url 'news_detail' post.id %}" class="news-title">{{ post.title|censor }}</a>
+                </td>
                 <td style="padding-right: 100px;">{{ post.post_time|date:'d M Y' }}</td>
                 <td style="text-align: left;">{{ post.content|truncatechars:21|censor }}</td>
             </tr>

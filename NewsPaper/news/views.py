@@ -70,6 +70,18 @@ class NewsDetail(DetailView):
         return obj
 
 
+def like_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    post.like()
+    return redirect('news_detail', pk=post_id)
+
+
+def dislike_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    post.dislike()
+    return redirect('news_detail', pk=post_id)
+
+
 class NewsSearch(ListView):
     model = Post
     ordering = '-post_time'

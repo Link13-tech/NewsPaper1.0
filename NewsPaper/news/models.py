@@ -46,6 +46,10 @@ class Post(models.Model):
     content = models.TextField()
     rating = models.IntegerField(default=0)
 
+    @property
+    def have_rating(self):
+        return self.rating > 0
+
     def __str__(self):
         return f'{self.title.title()}: {self.content[:20]}'
 
@@ -67,8 +71,8 @@ class Post(models.Model):
     def preview(self):
         return self.content[:124] + '...'
 
-    def get_absolute_url(self):
-        return reverse('news_detail', args=[str(self.id)])
+    # def get_absolute_url(self):
+    #     return reverse('news_detail', args=[str(self.id)])
 
 
 class PostCategory(models.Model):

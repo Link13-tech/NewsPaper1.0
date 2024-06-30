@@ -1,11 +1,13 @@
 from django.urls import path
 from .views import NewsList, NewsDetail, NewsSearch, NewsCreate, NewsUpdate, NewsDelete, ArticleCreate, ArticleUpdate, ArticleDelete, \
-    subscribe_to_category
+    subscribe_to_category, like_post, dislike_post
 from django.views.decorators.cache import cache_page
 
 urlpatterns = [
     path('', cache_page(60*1)(NewsList.as_view()), name='news_list'),
     path('<int:pk>', NewsDetail.as_view(), name='news_detail'),
+    path('post/<int:post_id>/like/', like_post, name='like_post'),
+    path('post/<int:post_id>/dislike/', dislike_post, name='dislike_post'),
     path('search/', NewsSearch.as_view(), name='news_search'),
     path('create/', NewsCreate.as_view(), name='news_create'),
     path('<int:pk>/edit/', NewsUpdate.as_view(), name='news_update'),
