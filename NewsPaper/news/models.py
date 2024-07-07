@@ -48,7 +48,7 @@ class Post(models.Model):
 
     @property
     def have_rating(self):
-        return self.rating > 0
+        return self.rating != 0
 
     def __str__(self):
         return f'{self.title.title()}: {self.content[:20]}'
@@ -60,12 +60,45 @@ class Post(models.Model):
         super().save(*args, **kwargs)
         cache.delete(f'news-{self.pk}')
 
-    def like(self):
-        self.rating += 1
+    def get_user_vote(self, user):
+        return self.vote_set.filter(user=user).first()
+
+    def like(self, user):
+        vote, created = Vote.objects.get_or_create(user=user, post=self, defaults={'is_like': True})
+
+        if not created and vote.is_like:
+            # Отменяем лайк
+            self.rating -= 1
+            vote.delete()
+        else:
+            if not created:
+                if not vote.is_like:
+                    self.rating += 2  # если был дизлайк, увеличиваем на 2
+                else:
+                    self.rating += 1
+            else:
+                self.rating += 1
+            vote.is_like = True
+            vote.save()
         self.save()
 
-    def dislike(self):
-        self.rating -= 1
+    def dislike(self, user):
+        vote, created = Vote.objects.get_or_create(user=user, post=self, defaults={'is_like': True})
+
+        if not created and not vote.is_like:
+            # Отменяем дизлайк
+            self.rating += 1
+            vote.delete()
+        else:
+            if not created:
+                if vote.is_like:
+                    self.rating -= 2  # если был лайк, уменьшаем на 2
+                else:
+                    self.rating -= 1
+            else:
+                self.rating -= 1
+            vote.is_like = False
+            vote.save()
         self.save()
 
     def preview(self):
@@ -73,6 +106,15 @@ class Post(models.Model):
 
     # def get_absolute_url(self):
     #     return reverse('news_detail', args=[str(self.id)])
+
+
+class Vote(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    is_like = models.BooleanField()
+
+    class Meta:
+        unique_together = ('user', 'post')
 
 
 class PostCategory(models.Model):

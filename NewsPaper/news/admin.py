@@ -1,12 +1,15 @@
 from django.contrib import admin
-from .models import Category, Post, Author, Comment
+from .models import Category, Post, Author, Comment, Vote
 
 
 def null_rating(modeladmin, request, queryset):
-    queryset.update(rating=0)
+    for post in queryset:
+        post.rating = 0
+        post.save()
+        Vote.objects.filter(post=post).delete()
 
 
-null_rating.short_description = 'Обнулить рейтинг постов'
+null_rating.short_description = 'Обнулить рейтинг постов и удалить все голоса'
 
 
 class PostAdmin(admin.ModelAdmin):

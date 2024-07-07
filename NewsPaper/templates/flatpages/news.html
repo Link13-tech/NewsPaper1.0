@@ -2,6 +2,7 @@
 {% load custom_filters %}
 {% load custom_tags %}
 
+
 {% block title %}
 News
 {% endblock title %}
@@ -49,6 +50,10 @@ News
                 {% if user.is_authenticated %}
                     {% if is_subscribed %}
                         <p>Вы уже подписаны на эту категорию.</p>
+                        <form method="post" action="{% url 'unsubscribe_from_category' category.id %}">
+                            {% csrf_token %}
+                            <button type="submit">Отписаться</button>
+                        </form>
                     {% else %}
                         <form method="post" action="{% url 'subscribe_to_category' category.id %}">
                             {% csrf_token %}
@@ -84,6 +89,7 @@ News
     {% else %}
         <h2>Новостей нет!</h2>
     {% endif %}
+
 
     {% if page_obj.has_previous %}
         <a href="?{% url_replace page=1 %}">1</a>

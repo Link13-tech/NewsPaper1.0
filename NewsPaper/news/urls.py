@@ -1,10 +1,10 @@
 from django.urls import path
 from .views import NewsList, NewsDetail, NewsSearch, NewsCreate, NewsUpdate, NewsDelete, ArticleCreate, ArticleUpdate, ArticleDelete, \
-    subscribe_to_category, like_post, dislike_post
-from django.views.decorators.cache import cache_page
+    subscribe_to_category, like_post, dislike_post, unsubscribe_from_category
+
 
 urlpatterns = [
-    path('', cache_page(60*1)(NewsList.as_view()), name='news_list'),
+    path('', NewsList.as_view(), name='news_list'),
     path('<int:pk>', NewsDetail.as_view(), name='news_detail'),
     path('post/<int:post_id>/like/', like_post, name='like_post'),
     path('post/<int:post_id>/dislike/', dislike_post, name='dislike_post'),
@@ -16,4 +16,5 @@ urlpatterns = [
     path('articles/<int:pk>/edit/', ArticleUpdate.as_view(), name='article_create'),
     path('articles/<int:pk>/delete/', ArticleDelete.as_view(), name='article_create'),
     path('category/<int:category_id>/subscribe/', subscribe_to_category, name='subscribe_to_category'),
+    path('unsubscribe/<int:category_id>/', unsubscribe_from_category, name='unsubscribe_from_category'),
 ]

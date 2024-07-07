@@ -4,7 +4,7 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .models import Post, Category
+from .models import Post, Category, Vote
 from .filters import NewsFilter
 from .forms import PostForm
 from django.core.cache import cache
@@ -55,6 +55,13 @@ def subscribe_to_category(request, category_id):
     return redirect(reverse('news_list') + f'?category={category_id}')
 
 
+@login_required
+def unsubscribe_from_category(request, category_id):
+    category = get_object_or_404(Category, id=category_id)
+    category.subscribers.remove(request.user)
+    return redirect(reverse('news_list') + f'?category={category_id}')
+
+
 class NewsDetail(DetailView):
     model = Post
     template_name = 'flatpages/new.html'
@@ -69,16 +76,25 @@ class NewsDetail(DetailView):
 
         return obj
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        post = self.get_object()
+        user_vote = post.get_user_vote(self.request.user) if self.request.user.is_authenticated else None
+        context['user_vote'] = user_vote
+        return context
 
+
+@login_required
 def like_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
-    post.like()
+    post.like(user=request.user)
     return redirect('news_detail', pk=post_id)
 
 
+@login_required
 def dislike_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
-    post.dislike()
+    post.dislike(user=request.user)
     return redirect('news_detail', pk=post_id)
 
 
