@@ -168,6 +168,12 @@ SOCIALACCOUNT_AUTO_SIGNUP = False
 dotenv_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'my_inf.env')
 load_dotenv(dotenv_path)
 
+# ADMINS = [
+#     ('Admin Name', 'admin@example.com'),
+# ]
+#
+# SERVER_EMAIL = 'server@example.com'
+
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
