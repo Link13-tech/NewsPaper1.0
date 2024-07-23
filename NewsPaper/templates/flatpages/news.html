@@ -1,7 +1,7 @@
 {% extends 'flatpages/default.html' %}
 {% load custom_filters %}
 {% load custom_tags %}
-
+{% load i18n %}
 
 {% block title %}
 News
@@ -27,14 +27,14 @@ News
 </style>
 <div class="container-fluid">
     <h3>{% current_time %}</h3>
-    <h1>Все новости</h1>
+    <h1>{% trans "All News" %}</h1>
     <h3>{{ total_news|length }}</h3>
     <hr>
 
     <form method="get" action="{% url 'news_list' %}">
-        <label for="category">Выберите категорию:</label>
+        <label for="category">{% trans "Select category" %}:</label>
         <select name="category" id="category" onchange="this.form.submit()">
-            <option value="">Все</option>
+            <option value="">{% trans "All" %}</option>
             {% for category in categories %}
                 <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>
                     {{ category.name }}
@@ -49,19 +49,19 @@ News
                 <h2>{{ category.name }}</h2>
                 {% if user.is_authenticated %}
                     {% if is_subscribed %}
-                        <p>Вы уже подписаны на эту категорию.</p>
+                        <p>{% trans "You are already subscribed to this category." %}</p>
                         <form method="post" action="{% url 'unsubscribe_from_category' category.id %}">
                             {% csrf_token %}
-                            <button type="submit">Отписаться</button>
+                            <button type="submit">{% trans "Unsubscribe" %}</button>
                         </form>
                     {% else %}
                         <form method="post" action="{% url 'subscribe_to_category' category.id %}">
                             {% csrf_token %}
-                            <button type="submit">Подписаться</button>
+                            <button type="submit">{% trans "Subscribe" %}</button>
                         </form>
                     {% endif %}
                 {% else %}
-                    <p><a href="{% url 'login' %}?next={% url 'news_list' %}?category={{ category.id }}">Войдите</a>, чтобы подписаться.</p>
+                    <p><a href="{% url 'login' %}?next={% url 'news_list' %}?category={{ category.id }}">{% trans "Login" %}</a>, {% trans "to subscribe." %}</p>
                 {% endif %}
             {% endif %}
         {% endfor %}
@@ -70,9 +70,9 @@ News
     {% if news %}
         <table class="table table-borderless">
             <tr>
-                <td style="text-center; font-weight: bold; font-size: 17px">Заголовок</td>
-                <td style="text-center; font-weight: bold; font-size: 17px; padding-right: 100px;">Дата публикации</td>
-                <td style="text-center; font-weight: bold; font-size: 17px">Превью</td>
+                <td style="text-center; font-weight: bold; font-size: 17px">{% trans "Title" %}</td>
+                <td style="text-center; font-weight: bold; font-size: 17px; padding-right: 100px;">{% trans "Publish Date" %}</td>
+                <td style="text-center; font-weight: bold; font-size: 17px">{% trans "Preview" %}</td>
             </tr>
 
             {% for post in news %}
@@ -87,7 +87,7 @@ News
 
         </table>
     {% else %}
-        <h2>Новостей нет!</h2>
+        <h2>{% trans "No news available!" %}</h2>
     {% endif %}
 
 

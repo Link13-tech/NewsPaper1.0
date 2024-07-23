@@ -1,34 +1,90 @@
 <!DOCTYPE html>
 {% load cache %}
+{% load i18n %}
+{% load tz %}
 <html lang="en">
-        <head>
-            <meta charset="utf-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-            <meta name="description" content="" />
-            <meta name="author" content="" />
-            <title>NewsPaper1.0</title>
-            <!-- Core theme CSS (includes Bootstrap)-->
-            {% load static %}
-            <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
-            <style>
-                .navbar-nav.user-menu {margin-left: auto}
-            </style>
-        </head>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>{% trans "NewsPaper1.0" %}</title>
+        <!-- Core theme CSS (includes Bootstrap)-->
+        {% load static %}
+        <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
+        <style>
+            .navbar-nav.user-menu {margin-left: auto}
+        </style>
+    </head>
     <body>
+                <!-- Передача времени в JavaScript -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Получение времени из переменной Django
+                var currentHour = new Date("{{ current_time|date:'Y-m-d H:i:s' }}").getHours();
+
+                // Установка цвета фона в зависимости от времени суток
+                if (currentHour >= 19 || currentHour < 7) {
+                    document.body.style.backgroundColor = 'darkcyan';
+                } else {
+                    document.body.style.backgroundColor = 'powderblue';
+                }
+            });
+        </script>
+        <!-- Форма выбора языка и таймзоны -->
+        <form action="{% url 'set_language' %}" method="POST" style="display: flex; align-items: center;">
+            {% csrf_token %}
+            <!-- Не забываем csrf_token для POST запросов -->
+            <input type="hidden" name="next" value="{{ redirect_to }}">
+
+            <!-- Выбор языка -->
+            <label for="language-select" style="margin-right: 10px;">{% trans "Language :" %}</label>
+            <select name="language" id="language-select" style="margin-right: 10px;">
+                {% get_available_languages as LANGUAGES %}
+                {% get_language_info_list for LANGUAGES as languages %}
+                {% get_current_language as LANGUAGE_CODE %}
+                {% for language in languages %}
+                    <option value="{{ language.code }}" {% if language.code == LANGUAGE_CODE %} selected {% endif %}>
+                        {{ language.name_local }} - {{ language.code }}
+                    </option>
+                {% endfor %}
+            </select>
+            <input type="submit" value="{% trans "Set" %}" style="margin-right: 10px;">
+        </form>
+            {% get_current_timezone as TIME_ZONE %}
+        <form action="" method="POST">
+            {% csrf_token %}
+            <!-- Выбор таймзоны -->
+            <label for="timezone" style="margin-right: 2px;">{% trans "Time zone :" %}</label>
+            <select name="timezone" id="timezone" style="margin-right: 7px;">
+                {% for tz in timezones %}
+                <option value="{{ tz }}" {% if tz == TIME_ZONE %} selected {% endif %}>{{ tz }}</option>
+                {% endfor %}
+            </select>
+            <input type="submit" value="{% trans "Go" %}" style="margin-right: 10px;">
+
+            <!-- Отображение текущей таймзоны и времени -->
+            <span id="timezone-display" style="margin-right: 10px;">
+                {% if TIME_ZONE %}
+                    {{ TIME_ZONE }}
+                    {{ current_time|timezone:TIME_ZONE }}
+                {% endif %}
+            </span>
+        </form>
         <!-- Responsive navbar-->
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container">
-                <a class="navbar-brand" href="#">NewsPaper1.0</a>
+                <a class="navbar-brand" href="#">{% trans "NewsPaper1.0" %}</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <ul class="navbar-nav mr-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="/about/">About</a>
+                            <a class="nav-link" href="/about/">{% trans "About" %}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/news/">News</a>
+                            <a class="nav-link" href="/news/">{% trans "News" %}</a>
                         </li>
                     </ul>
                     <ul class="navbar-nav user-menu"> <!-- Добавлен класс user-menu -->
@@ -38,7 +94,7 @@
                         </li>
                         {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="/accounts/login/">Login</a>
+                            <a class="nav-link" href="/accounts/login/">{% trans "Login" %}</a>
                         </li>
                         {% endif %}
                     </ul>

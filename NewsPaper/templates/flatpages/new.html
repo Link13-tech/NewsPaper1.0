@@ -1,8 +1,9 @@
 {% extends 'flatpages/default.html' %}
 {% load custom_filters %}
+{% load i18n %}
 
 {% block title %}
-News
+{% trans "News" %}
 {% endblock title %}
 
 
@@ -13,44 +14,44 @@ News
     <div style="font-size: 19px; line-height: 1.8; color: #800080;">
         {{ post.content|censor }}
     </div>
-    <p>Рейтинг: {{ post.rating }}</p>
+    <p>{% trans "Rating" %}: {{ post.rating }}</p>
 
     {% if request.user.is_authenticated %}
         {% if user_vote %}
             {% if user_vote.is_like %}
                 <form action="{% url 'like_post' post.id %}" method="post" style="display:inline;">
                     {% csrf_token %}
-                    <button type="submit">Unlike</button>
+                    <button type="submit">{% trans "Unlike" %}</button>
                 </form>
                 <form action="{% url 'dislike_post' post.id %}" method="post" style="display:inline;">
                     {% csrf_token %}
-                    <button type="submit">Dislike</button>
+                    <button type="submit">{% trans "Dislike" %}</button>
                 </form>
             {% else %}
                 <form action="{% url 'like_post' post.id %}" method="post" style="display:inline;">
                     {% csrf_token %}
-                    <button type="submit">Like</button>
+                    <button type="submit">{% trans "Like" %}</button>
                 </form>
                 <form action="{% url 'dislike_post' post.id %}" method="post" style="display:inline;">
                     {% csrf_token %}
-                    <button type="submit">Undislike</button>
+                    <button type="submit">{% trans "Undislike" %}</button>
                 </form>
             {% endif %}
         {% else %}
             <form action="{% url 'like_post' post.id %}" method="post" style="display:inline;">
                 {% csrf_token %}
-                <button type="submit">Like</button>
+                <button type="submit">{% trans "Like" %}</button>
             </form>
             <form action="{% url 'dislike_post' post.id %}" method="post" style="display:inline;">
                 {% csrf_token %}
-                <button type="submit">Dislike</button>
+                <button type="submit">{% trans "Dislike" %}</button>
             </form>
         {% endif %}
     {% else %}
-        <p>Чтобы проголосовать, пожалуйста, <a href="{% url 'login' %}">войдите</a> в свой аккаунт.</p>
+        <p>{% trans "To vote, please" %}, <a href="{% url 'login' %}">{% trans "login" %}</a> {% trans "to your account." %}</p>
     {% endif %}
 
     <div>
-        <a href="{% url 'news_list' %}">К списку новостей</a>
+        <a href="{% url 'news_list' %}">{% trans "Back to news list" %}</a>
     </div>
 {% endblock content %}

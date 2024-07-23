@@ -1,15 +1,20 @@
+import logging
+import pytz
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.core.cache import cache
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
+from django.utils.translation import gettext as _
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .models import Post, Category, Vote
+from django.utils import timezone
+
+from news.tasks import send_email_to_subscribers_task
 from .filters import NewsFilter
 from .forms import PostForm
-from django.core.cache import cache
-from news.tasks import send_email_to_subscribers_task
-import logging
+from .models import Post, Category
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +50,17 @@ class NewsList(ListView):
         else:
             context['is_subscribed'] = False
 
+        context['subscribe_text'] = _("Subscribe to this category")
+        context['unsubscribe_text'] = _("Unsubscribe from this category")
+        context['current_time'] = timezone.now()
+        context['timezones'] = pytz.common_timezones
+
         return context
+
+    @staticmethod
+    def post(request):
+        request.session['django_timezone'] = request.POST['timezone']
+        return redirect('/')
 
 
 @login_required
@@ -81,7 +96,16 @@ class NewsDetail(DetailView):
         post = self.get_object()
         user_vote = post.get_user_vote(self.request.user) if self.request.user.is_authenticated else None
         context['user_vote'] = user_vote
+        context['like_text'] = _("Like")
+        context['dislike_text'] = _("Dislike")
+        context['current_time'] = timezone.now()
+        context['timezones'] = pytz.common_timezones
         return context
+
+    @staticmethod
+    def post(request, *args, **kwargs):
+        request.session['django_timezone'] = request.POST['timezone']
+        return redirect('news_detail', pk=kwargs['pk'])
 
 
 @login_required
