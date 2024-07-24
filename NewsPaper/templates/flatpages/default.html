@@ -12,8 +12,25 @@
         <!-- Core theme CSS (includes Bootstrap)-->
         {% load static %}
         <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
         <style>
             .navbar-nav.user-menu {margin-left: auto}
+            .navbar-brand {margin-left: auto}
+            .dropdown-menu-right {right: 0; left: auto;}
+            .navbar-toggler-icon {
+                margin-left: 15px;
+                display: inline-block;
+                width: 25px;
+                height: 25px;
+                vertical-align: middle;
+                content: "";
+                background: no-repeat center center;
+                background-size: contain;
+                background-image: url('data:image/svg+xml;charset=UTF8,%3Csvg viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath stroke="rgba%280, 0, 0, 0.5%29" stroke-width="2" stroke-linecap="round" stroke-miterlimit="10" d="M4 7h22M4 15h22M4 23h22"/%3E%3C/svg%3E');
+            }
+            .navbar .dropdown-toggle::after {
+                display: none;
+            }
         </style>
     </head>
     <body>
@@ -73,7 +90,25 @@
         </form>
         <!-- Responsive navbar-->
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div class="container">
+            <div class="container d-flex">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarDropdownMenu" aria-controls="navbarDropdownMenu" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarDropdownMenu">
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="navbar-toggler-icon"></span>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="#">{% trans "Action" %}</a>
+                                <a class="dropdown-item" href="#">{% trans "Another action" %}</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#">{% trans "Something else here" %}</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
                 <a class="navbar-brand" href="#">{% trans "NewsPaper1.0" %}</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -113,5 +148,9 @@
                 </div>
             </div>
         </div>
+    <!-- Bootstrap core JavaScript-->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     </body>
 </html>
