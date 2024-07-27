@@ -1,6 +1,15 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+
 from .views import NewsList, NewsDetail, NewsSearch, NewsCreate, NewsUpdate, NewsDelete, ArticleCreate, ArticleUpdate, ArticleDelete, \
     subscribe_to_category, like_post, dislike_post, unsubscribe_from_category
+from .api_views import *
+
+router = DefaultRouter()
+router.register(r'news', NewsViewSet, basename='news')
+router.register(r'articles', ArticleViewSet, basename='articles')
+router.register(r'authors', AuthorViewSet, basename='author')
+router.register(r'categories', CategoryViewSet, basename='category')
 
 
 urlpatterns = [
@@ -17,4 +26,5 @@ urlpatterns = [
     path('articles/<int:pk>/delete/', ArticleDelete.as_view(), name='article_create'),
     path('category/<int:category_id>/subscribe/', subscribe_to_category, name='subscribe_to_category'),
     path('unsubscribe/<int:category_id>/', unsubscribe_from_category, name='unsubscribe_from_category'),
+    path('api/', include(router.urls)),
 ]
