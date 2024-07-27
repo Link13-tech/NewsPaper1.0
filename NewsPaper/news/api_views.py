@@ -6,6 +6,16 @@ from news.serializers import *
 from news.models import *
 
 
+class IsAuthorOrReadOnly(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        # Разрешены безопасные методы (GET, HEAD, OPTIONS)
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        # Разрешены изменения только автору
+        return obj.author == request.user or request.user.is_staff
+
+
 class AuthorViewSet(viewsets.ModelViewSet):
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
